@@ -1,0 +1,192 @@
+---
+title: "HW2"
+author: "Yashashri Kulkarni; 002429291"
+date: "9/17/2021"
+output: html_document
+---
+
+#### 1(a) Northwestern Minnesota is prone to widespread flooding in the Spring. Suppose that 20% of all farmers are insured against flood damage. Four farmers are selected at random. Let M denote the number among the four who have flood insurance. 
+#### What is the probability distribution of M?
+P(Success)= p= 0.2  
+P(Failure)= q= 1-p= 0.8  
+M is a random variable that can take values of 0, 1,2,3 or 4  
+size of sample picked= n= 4  
+``` {r echo= TRUE}
+d= dbinom(c(0:4),4,0.2)
+d
+plot(0:4,d, type= 'l', xlab= 'M', ylab= 'probability')
+```
+---
+##### 1(b) What is the expected value of M?
+Expected value of M  
+
+```{r echo= TRUE}
+E= d*c(0:4)
+sum(E)
+```
+
+##### 1(c) What is the variance of M?
+Variance
+```{r echo= TRUE}
+n= 4
+p= 0.2
+q= 0.8
+V= n*p*q
+V
+```
+##### 1(d) What is the probability that at least two of the four selected farmers have flood insurance?  
+P(atleast 2 successes)= P(M>= 2)= 1-[P(M= 0)+P(M= 1)]
+```{r echo= TRUE}
+1-(dbinom(0,4,0.2)+dbinom(1,4,0.2))
+```
+---
+##### 2. The 2010 American Community Survey estimates that 47.1% of women ages 15 years and over are married.
+##### (a) We randomly select three women between these ages. What is the probability that the third woman selected is the only one who is married?  
+p(success)= P(married)= 0.471
+q= 1-p= 0.521
+P(only third woman selected is married)= P(unmarried)* P(unmarried)* P(married)  
+
+```{r echo= TRUE}
+p= 0.471
+q= 0.529
+q* q* p
+```
+##### 2(b) What is the probability that all three randomly selected women are married?
+P(all randomly selected women are married)= p* p* p
+``` {r echo= TRUE}
+p* p* p
+```
+##### 2(c)  On average, how many women would you expect to sample before selecting a married woman? What is the standard deviation?
+Expected value of a geometric distribution= mu= 1/p    
+VarX= variance of a geometric dist= (1-mu)/mu^2  
+```{r echo= TRUE}
+p= 0.471
+
+mu= 1/p
+mu
+
+VarX= (1-p)/(p^2)
+VarX
+
+stdeviation= sqrt(VarX)
+stdeviation
+```
+Taking a random sample of 500 picks, it takes nearly 350 picks before encountering the first married woman.  
+```{r echo= TRUE}
+sample <- rgeom(500, 0.471)
+hist(sample, col='light grey', border='grey', xlab = '')
+```
+
+##### 2(d) If the proportion of married women was actually 30%, how many women would you expect to sample before selecting a married woman? What is the standard deviation?
+Expected value of a geometric distribution= mu= 1/p   
+Here, p= 0.3
+VarX= variance of a geometric dist= (1-mu)/mu^2  
+```{r echo= TRUE}
+p= 0.3
+
+mu= 1/p
+mu
+
+VarX= (1-p)/(p^2)
+VarX
+
+stdeviation= sqrt(VarX)
+stdeviation
+```
+##### 2(e) Based on your answers to parts (c) and (d), how does decreasing the probability of an event affect the mean and standard deviation of the wait time until success? 
+
+Comparing the expected values from the two cases, the smaller the probability of success, the more picks would have to take place before encountering the first success. hence probability and wait time are inversely related.
+
+##### 3. A not-so-skilled volleyball player has a 15% chance of making the serve, which involves hitting the ball so it passes over the net on a trajectory such that it will land in the opposing team’s court. Suppose that her serves are independent of each other.
+##### (a) What is the probability that on the 10th try she will make her 3rd successful serve?
+```{r echo= TRUE}
+p= 0.15
+q= 0.85
+choose(9,2)* (0.15^3)* (0.85^7)
+```
+#### 3(b) Suppose she has made two successful serves in nine attempts. What is the probability that her 10th serve will be successful?
+Probability of each success is independent. Hence it would be 15%.
+
+#### 3(c) Even though parts (a) and (b) discuss the same scenario, the probabilities you calcu- lated should be different. Can you explain the reason for this discrepancy?
+
+Part a of the problem accounts for all possible scenarios of 10 serves, with the third successful serve occurring only in the 10th serve.  
+Whereas part b talks about each independent event occurring irrespective of what happened in the past events. Hence the probability of success in each serve remains the same i.e. 15%.  
+
+#### 4. In a particularly delicate process for manufacturing a particular type of experimental silicon chip, the probability of successfully producing a marketable chip is 70%. The company needs to produce 12 marketable chips, but only has the budget to manufacture 15 chips.
+#### (a) What is the probability that they will be able to produce 12 marketable chips in at most 15 attempts?
+Setting the parameters,  
+prob= 0.7
+n <= 3
+x= 12
+
+```{r echo= TRUE}
+pnbinom(3,12, 0.7, lower.tail = TRUE)
+```
+
+There's only 29% chances that 12 chips will be manufactured with at most 3 faulty chips.
+
+#### 4(b) How many chips described in this problem need to be manufactured so that the prob- ability of getting at least 12 marketable chips is 95%.
+
+```{r echo= TRUE}
+cdf= pnbinom(1:30, 12, 0.7, lower.tail = TRUE)
+plot(cdf, type= 'l', xlab= 'number of attempts', ylab= 'Probability')
+abline(h= .95, v= 10, col= "orange")
+```
+
+As can be seen from the above plot, there would have to be nearly 10 failed trials until the probability of achieving 12 successes is reached.  
+
+Hence there would have be to atleast 22 (12+ 10) trials until 95% prob of getting 12 marketable chips.
+
+#### 5. A coffee shop serves an average of 75 customers per hour during the morning rush.
+#### (a)Which distribution we have studied is most appropriate for calculating the probability of a given number of customers arriving within one hour during this time of day?  
+Poisson distribution.
+
+#### 5(b) What are the mean and the standard deviation of the number of customers this coffee shop serves in one hour during this time of day?  
+mean= variance= 75
+standard dev= 8.66 customers
+
+```{r echo TRUE}
+sqrt(75)
+```
+
+
+#### 5(c) Would it be considered unusually low if only 60 customers showed up to this coffee shop in one hour during this time of day?
+
+Yes, it would be considered unusually low. Probability is 0.01  and even the cumulative prob is 0.04, both of which are low.
+```{r echo= TRUE}
+dpois(60, 75)
+ppois(60, 75)
+```
+
+#### 5(d) Calculate the probability that this coffee shop serves 70 customers in one hour during this time of day?
+```{r echo= TRUE}
+dpois(70, 75)
+```
+
+#### 6.Suppose f(X) = 1.5(x − 1)2 for 0 < x < 2. Determine the cumulative distribution function, mean and variance of X.
+
+```{r echo= TRUE}
+fx<- function(x){
+  1.5*((x-1)^2)
+}
+
+cdf= integrate(fx, lower = 0, upper = 2)
+curve(fx, 0, 2, 1000)
+
+#Mean of X, 
+#It is clear from the plot above that the curve is symmetric around x=1 and hence the mean should be 1.
+
+fx1= function(x){
+  1.5*x*(x-1)^2
+}
+m= integrate(fx1, lower= 0, upper= 2)
+m$value
+
+#Variance of X,
+fx2= function(x){
+  1.5*x*x*(x-1)^2
+}
+z=integrate(fx2, 0, 2)
+var= z$value-m$value
+var
+```
