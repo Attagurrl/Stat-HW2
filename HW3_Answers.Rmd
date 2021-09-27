@@ -1,0 +1,275 @@
+---
+title: "HW3-Solution"
+author: "Yashashri Kulkarni"
+date: "9/25/2021"
+output: html_document
+---
+#### 1. Assume Z has a standard normal distribution. Determine the value for z that solves each of the following:
+#### (a) P(−z<Z<z)=0.9
+
+To determine z such that P (−z < Z ≤ z) = 0.9
+If 90% of the area lies between −z and z, then 10% of the area must lie outside of this range. 
+Since normal curves are symmetric, half of this amount– 5%– must lie before −z. 
+Then the area under the curve before z must be: 0.05+0.9= 0.95   
+
+```{r echo=TRUE}
+z= qnorm(c(.05, .95))
+z
+```
+
+#### (b) P(−1.1<Z <z)=0.8
+80% of the area under the curve must lie between -1.1 and z.  
+    => pnorm(z)- pnorm(-1.1)= 0.8  
+    => pnorm(z)= 0.8+pnorm(-1.1)
+
+```{r setup, echo=TRUE}
+z= qnorm(0.8+pnorm(-1.1))
+z
+```
+#### 2. The speed of a file transfer from a server on campus to a personal computer at a student’s home on a weekday evening is normally distributed with a mean of 60 kilobits per second and a standard deviation of 4 kilobits per second.
+#### (a) What is the probability that the file will transfer at a speed of 70 kilobits per second or more?
+```{r echo= TRUE}
+mu <- 60 ; sigma <- 4
+#P(z> 70)
+1- (pnorm(70, mu, sigma)- pnorm(0, mu, sigma))
+```
+#### (b) What is the probability that the file will transfer at a speed of less than 58 kilobits per second?
+``` {r echo= TRUE}
+#P(0< z< 58)
+(pnorm(58, mu, sigma)- pnorm(0, mu, sigma))
+```
+#### (c) If the file is 1 megabyte, what is the average time it will take to transfer the file? (Assume eight bits per byte.)
+```{r echo= TRUE}
+size= 1000*8 #in kilobits
+t= size/mu
+t/60 #in minutes  
+```
+
+#### 3. Hits to a high-volume Web site are assumed to follow a Poisson distribution with a mean of 10,000 per day. Approximate each of the following:
+#### (a) The probability of more than 20,000 hits in a day
+```{r echo= TRUE}
+ppois(20000, lambda= 10000,lower.tail = FALSE)
+```
+#### (b) The probability of less than 9900 hits in a day
+```{r echo= TRUE}
+ppois(9900, lambda= 10000,lower.tail = TRUE)
+```
+
+#### (c) The value such that the probability that the number of hits in a day exceed the value is 0.01
+```{r echo= TRUE}
+qpois(.01, lambda = 10000, lower.tail = FALSE)
+```
+#### 4. Calls to the help line of a large computer distributor follow a Poisson distribution with a mean of 20 calls per minute.
+#### (a) What is the mean time until the one-hundredth call? (3 points)
+```{r echo= TRUE}
+# The Erlang random variable describes the time interval between any event and the kth following event.
+# mean of Erlang RV= k/lambda
+# Here r= 100, lambda= 20
+100/20
+```
+#### (b) What is the mean time between call numbers 50 and 80? (3 points)
+```{r echo= TRUE}
+# r= 30, lambda= 20
+30/20
+```
+#### (c) What is the probability that three or more calls occur within 15 seconds? (5 points)
+P(X>= 3)= 1-[P(0)+P(1)+P(2)]
+```{r echo= TRUE}
+# Creating a function to calculate the Erlang pdf using the given parameters altogether
+# Here lambda,l, i.e.the mean, is taken as 5. 
+# (20 calls per minute== 5 calls per 15 seconds)
+
+1-ppois(2, 5)
+```
+#### 5. Suppose the random variables X, Y, and Z have the following joint probability distribution.
+Determine the following: 
+```{r echo= FALSE}
+# creating the joint probability matrix
+x= c(1,1,1,1,2,2,2,2)
+y= c(1,1,2,2,1,1,2,2)
+z= c(1,2)
+f_XYZ= c(.05,.1, .15, .2,.2, .15, .1, .05)
+p= cbind(x,y,z,f_XYZ)
+p.df= as.data.frame(p)
+p.df
+```
+#### (a) P(X = 2)
+```{r echo= TRUE}
+#For X=2
+sum(f_XYZ[x==2])
+```
+#### (b) P(X=1,Y =2) 
+```{r echo= TRUE}
+sum(subset.data.frame(p.df, p.df$x==1 & p.df$y== 2)$f_XYZ)
+```
+#### (c) P(Z < 1.5)
+```{r echo= TRUE}
+sum(subset.data.frame(p.df, p.df$z< 1.5)$f_XYZ)
+```
+#### (d) P(X=1orZ=2)
+```{r echo= TRUE}
+sum(subset.data.frame(p.df, p.df$x==1 | p.df$z== 2)$f_XYZ)
+```
+#### (e) E(X)
+```{r echo= TRUE}
+mu_X= sum(x*f_XYZ)
+mu_X
+```
+#### (f) P(X = 1|Y = 1)
+```{r echo= TRUE}
+sum(subset.data.frame(p.df, p.df$x==1 & p.df$y== 1)$f_XYZ)/ sum(subset.data.frame(p.df, p.df$y== 1)$f_XYZ)
+```
+#### (g) P(X =1,Y =1|Z =2)
+```{r echo= TRUE}
+sum(subset.data.frame(p.df, p.df$x==1 & p.df$y== 1 & p.df$z== 2)$f_XYZ)/ sum(subset.data.frame(p.df, p.df$z== 2)$f_XYZ)
+```
+#### (h) P(X =1|Y =1,Z =2)
+```{r echo= TRUE}
+sum(subset.data.frame(p.df, p.df$x==1 & p.df$y== 1 & p.df$z== 2)$f_XYZ)/ sum(subset.data.frame(p.df, p.df$y== 1 & p.df$z== 2)$f_XYZ)
+```
+#### (i) Conditional probability distribution of X given that Y = 1 and Z = 2.
+```{r echo= TRUE}
+# When X=1, Y=1, Z= 2
+sum(subset.data.frame(p.df, p.df$x==1 & p.df$y== 1 & p.df$z== 2)$f_XYZ)/sum(subset.data.frame(p.df, p.df$y== 1 & p.df$z== 2)$f_XYZ)
+# When X=2, Y=1, Z= 2
+sum(subset.data.frame(p.df, p.df$x==2 & p.df$y== 1 & p.df$z== 2)$f_XYZ)/sum(subset.data.frame(p.df, p.df$y== 1 & p.df$z== 2)$f_XYZ)
+```
+#### (j) Cov(x,y) 
+```{r echo= TRUE}
+mu_Y= sum(y*f_XYZ)
+mu_Y
+cov_XY= sum((x-mu_X)*(y-mu_Y)*f_XYZ)
+cov_XY
+```
+#### (k) Cov(x,z) 
+```{r echo= TRUE}
+mu_Z= sum(z*f_XYZ)
+mu_Z
+cov_XZ= sum((x-mu_X)*(z-mu_Z)*f_XYZ)
+cov_XZ
+```
+#### (l) Cov(y,z)
+```{r echo= TRUE}
+cov_YZ= sum((y-mu_Y)*(z-mu_Z)*f_XYZ)
+cov_YZ
+```
+```{r echo= TRUE}
+library(pracma)
+```
+#### 6. Consider the joint probability density function fXY (x,y) = c(x+y) over the range 0 < x < 3 and x<y<x+2. Determine
+#### (a) c
+```{r echo= TRUE}
+fun= function(x,y){x+y}
+ymin= function(x){x}
+ymax= function(x){x+2}
+i= integral2(fun,xmin= 0,xmax= 3,ymin,ymax)$Q
+i
+```
+c= 1/i= 1/24  
+
+#### (b) P(X<1,Y <2)
+From above steps, f(x,y)= (x+y)/24
+```{r echo= TRUE}
+fun= function(x,y){(x+y)/24}
+ymin= function(x){x}
+integral2(fun,xmin= 0, xmax= 1,ymin, ymax=2)$Q
+```
+#### (c) P(1<X<2)
+```{r echo= TRUE}
+ymin= function(x){x}
+ymax= function(x){x+2}
+
+i= integral2(fun,xmin= 1,xmax= 2,ymin, ymax)$Q
+i
+```
+#### (d) P(Y > 1)
+```{r echo= TRUE}
+ymin= function(x){x}
+ymax= function(x){x+2}
+
+a= integral2(fun, xmin= 0,xmax= 1, ymin= 1,ymax)$Q
+b= integral2(fun, xmin= 1, xmax= 3,ymin,ymax)$Q
+a+b
+```
+#### (e) P(X<2,Y <2) (f) E(X)
+```{r echo= TRUE}
+ymin= function(x){x}
+i= integral2(fun, 0,2,ymin,2)$Q
+print(i)
+```
+#### (f) E(X)
+```{r echo= TRUE}
+fun= function(x, y){x*(x+y)/24}
+ymin= function(x){x}
+ymax= function(x){x+2}
+E_X= integral2(fun, 0,3,ymin, ymax)
+E_X$Q
+```
+
+#### (g) Marginal probability distribution of X  
+$\int_{x}^{x+2}\left(\frac{x+y}{24}\right) \;dy$  
+= $\left.\frac{1}{24}\left(xy+\frac{y^2}{2}\right) \right|_{x}^{x+2}\;dx$   
+= $\frac{1}{12} (2x+1)$
+
+```{r echo= TRUE}
+(2*(0:2)+1)/12  
+```
+#### (h) Conditional probability distribution of Y given that X = 1  
+= $\frac {f(X=1, Y=y)}{f(X=1)}$  
+= $\frac {y+1}{6}$  
+```{r echo= TRUE}
+(c(1:3)+1)/12 
+```
+
+#### (i) E(Y|X =1)
+```{r echo= TRUE}
+fun= function(y){y*(y+1)/6}
+integral(fun, 1,3)
+```
+#### (j) P(Y >2|X =1)
+```{r echo= TRUE}
+fun= function(y){(y+1)/6}
+integral(fun, 2,3)
+```
+#### (k) Conditional probability distribution of X given that Y = 2  
+Conditional Prob= Joint Dist/Marginal Dist  
+Joint.dist= $\int_{0}^{y}\left(\frac{1}{24} (x+y)\right) \;dx$ = $\frac {y^2}{16} $  
+Marginal.dist= $\frac {(x+2)}{24}$  
+
+Cond.Prob= $\frac {(x+2)/24}{2^2/16}= \frac {x+2}{6}$
+
+#### (l) Cov(x,y) 
+cov(x,y)= E(XY)- E(X)E(Y)
+```{r echo= TRUE}
+fun= function(x, y){y*(x+y)/24}
+ymin= function(x){x}
+ymax= function(x){x+2}
+E_Y= integral2(fun, 0,3,ymin, ymax)
+
+fun= function(x,y){x*y*(x+y)/24}
+ymin= function(x){x}
+ymax= function(x){x+2}
+E_XY= integral2(fun, 0,3,ymin, ymax)
+
+Cov_XY= E_XY$Q-(E_X$Q*E_Y$Q)
+Cov_XY
+```
+#### (m) ρx,y
+
+```{r echo= TRUE}
+E_X$Q
+fun= function(x, y){x^2*(x+y)/24}
+ymin= function(x){x}
+ymax= function(x){x+2}
+E_X2= integral2(fun, 0,3,ymin, ymax)$Q
+
+fun= function(x, y){y^2*(x+y)/24}
+ymin= function(x){x}
+ymax= function(x){x+2}
+E_Y2= integral2(fun, 0,3,ymin, ymax)$Q
+
+VarX= E_X2- (E_X$Q)^2
+VarY= E_Y2- (E_Y$Q)^2
+
+Cov_XY/(sqrt(VarX)* sqrt(VarY))
+```
