@@ -1,0 +1,277 @@
+---
+title: "Midterm- Solution"
+author: "Yashashri Kulkarni"
+date: "10/10/2021"
+output: html_document
+---
+I have neither given nor recieved aid on this exam, nor have I concealed any violation of the Honor Code.
+
+(a) (FALSE) 
+(b) (FALSE) 
+(c) (FALSE) 
+(d) (TRUE) 
+(e) (FALSE)
+(f) (TRUE) 
+
+Problem 2 (9 points total, 3 points each part)
+
+```{r echo= TRUE}
+## This is a binomial Dist with success p= .65 and failure, q= .35
+#(a) hits the bull’s eye for the 10th time on the 15th try?
+dbinom(9,14,.65)* dbinom(1,1,.65)
+
+#(b) hits the bull’s eye 10 times in 15 tries?
+dbinom(10 ,15, .65)
+#(c) hits the first bull’s eye on the third try?
+p=.65
+q=.35
+(p^1)*(q^2)
+```
+
+Problem 3 (9 points total, 3 points each part)
+```{r echo= TRUE}
+# A)Probability of person being a criminal, P(C)
+#Using total probability law
+(.3*.25)+ (.7*.1)
+```
+B) What is the probability that the person is from group 1 if he is a criminal?  
+$P(A | C)= \frac {P(A \cap C)}{P(C)}$
+```{r echo= TRUE}
+(.3* .25)/.145
+```
+
+C) What is the probability that the person is from group 2 if she is a criminal?  
+$P(B | C)= \frac {P(B \cap C)}{P(C)}$
+```{r echo= TRUE}
+(.7*.1)/ .145
+```
+
+Problem 4 (16 points total, 2 points each part)
+
+1.CDF: discreet var  
+2.Not a CDF  
+3.Not a CDF  
+4.Not a CDF  
+5.CDF, Continous  
+6.Not a CDF  
+7.CDF, Continous  
+8.CDF, Continous  
+
+
+Problem 5 (18 points total, 3 points each part)
+a) c
+```{r echo= TRUE}
+library(pracma)
+x= c(0:2)
+y= c(0:2)
+
+fun= function (x, y){
+  x^2+ (x*y)}
+c= 1/integral2(fun,xmin=0, xmax=2, ymin= 0, ymax=2)$Q
+c
+```
+b) Joint cdf $F_{X,Y}(x,y)$
+\begin{aligned}
+F_{X,Y}(x,y) &= \int_{-\infty}^{y}\int_{-\infty}^{x}{f_{X,Y}(x,y)dxdy}\\
+&= \frac{3}{28}\int_{0}^{y}\int_{0}^{x}{(x^{2}+ xy)}dxdy\\
+&= \frac{3}{28}\int_{0}^{y}{\left(\frac{x^{3}}{3}+ \frac{x^{2}y}{2}\right)}dy\\
+&= \frac{1}{28*4}{\left(\frac{4x^{3}}{y}+ \frac{3x^{2}y^{2}}{2}\right)}\\
+&= \frac{1}{112}{\left(\frac{4x^{3}}{y}+ \frac{3x^{2}y^{2}}{2}\right)}\\
+\end{aligned}
+
+```{r echo= TRUE}
+f_XY = function(x,y){3/28*(x**2 + x*y)}
+F_XY = integrate(function(x){
+  sapply(x, function(x) {
+    integrate(function(y) f_XY(x,y), 0, 2)$value
+  })
+}, 0, 2)$value
+F_XY
+```
+c) Find the marginal cumulative distribution functions FX(x) and FY(y) and the marginal pdf fX(x) and fY(y) 
+
+```{r echo= TRUE}
+# Marginal Probability Distribution function of x
+f_X = function(X){
+  sapply(x, function(x){
+    integrate(function(y) f_XY(x,y), 0, 2)$value
+  })
+}
+f_X
+
+# Marginal Probability Distribution function of y
+f_y = function(X){
+  sapply(x, function(x){
+    integrate(function(y) f_XY(x,y), 0, 2)$value
+  })
+}
+f_y
+
+# CDF of x
+F_X = integrate(function(x){
+  sapply(x, function(x) {
+    integrate(function(y) f_XY(x,y),0,2)$value
+  })
+},0,2)$value
+F_X
+
+# CDF of y
+F_Y = integrate(function(x){
+  sapply(x, function(x) {
+    integrate(function(y) f_XY(x,y),0,2)$value
+  })
+},0,2)$value
+
+F_Y
+```
+d) Find E(X) and Var(X)
+```{r echo= TRUE}
+# Mean and Variance of x
+mu_x = integrate(function(x){
+  sapply(x, function(x){
+    integrate(function(y) x*f_XY(x,y), 0, 2)$value
+  })
+}, 0, 2)$value
+mu_x
+
+var_X = integrate(function(x){
+  sapply(x, function(x){
+    integrate(function(y) (x-mu_x)**2*f_XY(x,y), 0, 2)$value
+  })
+}, 0, 2)$value
+var_X
+```
+e) Find E(Y ) and Var(Y)
+```{r echo= TRUE}
+# Mean and variance of y
+mu_y = integrate(function(x){
+  sapply(x, function(x){
+    integrate(function(y) y*f_XY(x,y), 0, 2)$value
+  })
+}, 0, 2)$value
+mu_y
+
+var_y = integrate(function(x){
+  sapply(x, function(x){
+    integrate(function(y) (y-mu_y)**2*f_XY(x,y), 0, 2)$value
+  })
+}, 0, 2)$value
+var_y
+```
+
+f) Find the covariance and correlation of X and Y 
+```{r echo= TRUE}
+# Covariance of X,Y
+cov_XY = integrate(function(x){
+  sapply(x,function(x) {
+    integrate(function(y) (x-mu_x)*(y-mu_y)*f_XY(x,y),  0, 2)$value
+  })
+}, 0, 2)$value 
+cov_XY
+
+# correlation of X,Y
+sigma_x = sqrt(integrate(function(x){
+  sapply(x, function(x) {
+    integrate(function(y) (x-mu_x)**2*f_XY(x,y), 0 ,2)$value
+  })
+}, 0, 2)$value)
+sigma_x
+
+sigma_y = sqrt(integrate(function(x){
+  sapply(x, function(x) {
+    integrate(function(y) (x-mu_y)**2*f_XY(x,y), 0 ,2)$value
+  })
+}, 0, 2)$value)
+sigma_y
+
+rho_XY = cov_XY/(sigma_x + sigma_y)
+rho_XY
+```
+Problem 6. (a)
+```{r echo= TRUE}
+#C is type of computer randomly chosen
+c= c(0,0,0,0,1,1,1,1)
+#R is number of times rebooted
+r= c(1,2,3,8,1,2,3,8)
+f_cr= c(1/6, 2/6,0,1/6,0,1/6,1/6,0)
+f_cr[c==1]
+
+#finding the marginal dist of c
+C =unique(c)
+f_c= rep(0,length(C))
+for (i in 1: length(C)){
+  f_c[i]= sum(f_cr[c=C[i]])
+}
+f_c
+
+R =unique(r)
+f_r= rep(0,length(R))
+for (i in 1: length(R)){
+  f_r[i]= sum(f_cr[r=R[i]])
+}
+f_r
+```
+(b)E(C) and E(R) 
+```{r echo= TRUE}
+(mu_c= sum(c*f_cr))
+(mu_r= sum(r*f_cr))
+
+(mu_cr= sum(c*r*f_cr))
+```
+
+(c) Covariance of C and R
+```{r echo= TRUE}
+#Cov_CR
+#Cov_CR= E(C)* E(R)- E(CR)
+(Cov_CR= mu_c*mu_r-mu_cr)
+
+#As the cov is positive, they are directly proportional and hence they are not independent.
+```
+(d) Joint Prob of M and W  
+6,d,a) Create the table of joint prob and marginal pmfs.
+```{r echo= FALSE}
+m= c(1,2,8,1,2,8)
+w= c(2,3,2,3,2,3)
+f_MW= c(1/8, 2/8,1/8,1/8,2/8,1/8)
+f_MW_df= data.frame(m,w,f_MW, stringsAsFactors = FALSE)
+f_MW_df
+
+f_w=c(c(sum(f_MW_df$f_MW[f_MW_df$w==c(2)])), c(sum(f_MW_df$f_MW[f_MW_df$w==c(3)])),sum(f_MW))
+f_w
+
+f_m= c(c(sum(f_MW_df$f_MW[f_MW_df$m==c(1)])),c(sum(f_MW_df$f_MW[f_MW_df$m==c(2)])),c(sum(f_MW_df$f_MW[f_MW_df$m==c(8)])),c(sum(f_MW_df$f_MW[f_MW_df$m==c(1)])),c(sum(f_MW_df$f_MW[f_MW_df$m==c(2)])),c(sum(f_MW_df$f_MW[f_MW_df$m==c(8)])),sum(f_MW))
+f_m
+t1= rbind(f_MW_df, f_w)
+table= cbind(t1, f_m)
+table
+```
+6,d,b) Calculate P(W>M)
+```{r echo= TRUE}
+1/8+1/8+2/8
+```
+6,d,c) Correlation
+```{r echo= TRUE}
+mu_W= 2*.5+ 3*.5
+mu_M= 1*2/8 + 2*4/8+ 8*2/8
+
+mu_WM= 2/8+3/8+1+12/8+16/8+24/8
+mu_WM
+
+Cov_WM= mu_W*mu_M- mu_WM
+Cov_WM
+```
+Since Covariance is 0, correlation would be zero too.
+
+Problem 8
+```{r echo= TRUE}
+y= c(293,230,172,91,113,125)
+x1= c(1.6, 15.5, 22, 43, 33, 40)
+x2= c(851,816,1058,1201,1357,1115)
+
+b2= (sum(y*x1)*sum(x2^x1)- sum(x1^2)*sum(x2*y))/((sum(x1*x2)*sum(x2*x1))-(sum(x1^2)*sum(x2^2)))
+b2
+
+b1= (sum(x2^2)*sum(x1^y)- sum(x1*x2)*sum(x2*y))/((sum(x1^2)*sum(x2^2))-(sum(x1*x2)*sum(x2*x1)))
+b1
+```
+
